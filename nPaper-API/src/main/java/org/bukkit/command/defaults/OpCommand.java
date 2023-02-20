@@ -60,10 +60,10 @@ public class OpCommand extends VanillaCommand {
 
             ArrayList<String> matchedPlayers = new ArrayList<String>();
             for (Player player : sender.getServer().getOnlinePlayers()) {
-                String name = player.getName();
                 if (player.isOp()) {
                     continue;
                 }
+                final String name = player.getName();
                 if (StringUtil.startsWithIgnoreCase(name, lastWord)) {
                     matchedPlayers.add(name);
                 }

@@ -56,7 +56,9 @@ class ThreadPlayerLookupUUID implements Runnable {
             // CraftBukkit start - catch all exceptions
         } catch (Exception exception) {
             this.a.disconnect("Failed to verify username!");
-            LoginListener.c(this.a).server.getLogger().log(java.util.logging.Level.WARNING, "Exception verifying " + LoginListener.a(this.a).getName(), exception);
+            if (LoginListener.c(this.a) != null) { // Rinny - Fix NPE
+            	LoginListener.c(this.a).server.getLogger().log(java.util.logging.Level.WARNING, "Exception verifying " + LoginListener.a(this.a).getName(), exception);
+            }
             // CraftBukkit end
         }
     }

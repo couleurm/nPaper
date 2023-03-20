@@ -349,4 +349,9 @@ public class PaperSpigotWorldConfig
     	knockbackForceAndHeight = getDouble( "knockback.force", knockbackForceAndHeight );
     	knockbackVerticalLimit = getDouble( "knockback.vertical-limit", knockbackVerticalLimit );
     }
+    
+    public boolean fixArrowVelocity = true;
+	private void fixArrowVelocity() {
+		fixArrowVelocity = getBoolean("fix-arrow-velocity", fixArrowVelocity);
+	}
 }

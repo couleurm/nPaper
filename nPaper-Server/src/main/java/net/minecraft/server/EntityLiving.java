@@ -1277,14 +1277,16 @@ public abstract class EntityLiving extends Entity {
 
     protected long lastJumpTime = 0L;
     protected void bj() {
-        final long time = System.nanoTime();
         boolean canCrit = true;
-        if (this instanceof EntityPlayer) {
-            canCrit = false;
-            if (time - this.lastJumpTime > (long)(0.250e9)) {
-                this.lastJumpTime = time;
-                canCrit = true;
-            }
+        if (this.world.paperSpigotConfig.fixArrowVelocity) {
+        	final long time = System.nanoTime();
+	        if (this instanceof EntityPlayer) {
+	            canCrit = false;
+	            if (time - this.lastJumpTime > (long)(0.250e9)) {
+	                this.lastJumpTime = time;
+	                canCrit = true;
+	            }
+	        }
         }
         this.motY = 0.41999998688697815D;
         if (this.hasEffect(MobEffectList.JUMP)) {

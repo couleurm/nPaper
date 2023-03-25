@@ -830,6 +830,7 @@ public abstract class EntityLiving extends Entity {
     }
 
     public void die(DamageSource damagesource) {
+    	if (this.dead) return;
         Entity entity = damagesource.getEntity();
         EntityLiving entityliving = this.aX();
 
@@ -882,14 +883,14 @@ public abstract class EntityLiving extends Entity {
             this.al = true;
             // Rinny start - configurable knockback
             double magnitude = MathHelper.sqrt(d0 * d0 + d1 * d1);
-            double d2 = 0.4;
+            double d2 = this.world.paperSpigotConfig.knockbackForceAndHeight;
 
             this.motX /= 2.0;
             this.motY /= 2.0;
             this.motZ /= 2.0;
 
             this.motX -= d0 / magnitude * d2;
-            this.motY = MathHelper.limit(this.motY + d2, 0.05D, 4.0);
+            this.motY = MathHelper.limit(this.motY + d2, 0.05D, this.world.paperSpigotConfig.knockbackVerticalLimit);
             this.motZ -= d1 / magnitude * d2;
             // Rinny end
         }
@@ -1274,13 +1275,25 @@ public abstract class EntityLiving extends Entity {
         this.enderTeleportTo(d0, d1, d2);
     }
 
+    protected long lastJumpTime = 0L;
     protected void bj() {
+        boolean canCrit = true;
+        if (this.world.paperSpigotConfig.fixArrowVelocity) {
+        	final long time = System.nanoTime();
+	        if (this instanceof EntityPlayer) {
+	            canCrit = false;
+	            if (time - this.lastJumpTime > (long)(0.250e9)) {
+	                this.lastJumpTime = time;
+	                canCrit = true;
+	            }
+	        }
+        }
         this.motY = 0.41999998688697815D;
         if (this.hasEffect(MobEffectList.JUMP)) {
             this.motY += (double) ((float) (this.getEffect(MobEffectList.JUMP).getAmplifier() + 1) * 0.1F);
         }
 
-        if (this.isSprinting()) {
+        if (canCrit && this.isSprinting()) {
             float f = this.yaw * 0.017453292F;
 
             this.motX -= (double) (MathHelper.sin(f) * 0.2F);

@@ -335,4 +335,23 @@ public class PaperSpigotWorldConfig
     {
         tntExplosionVolume = getFloat( "tnt-explosion-volume", 4.0F );
     }
+    
+    public double knockbackSprintVertical = 0.1D;
+    public double knockbackSprintHorizontal = 0.5D;
+    public boolean knockbackResetFallDistance = false;
+    public double knockbackForceAndHeight = 0.4D;
+    public double knockbackVerticalLimit = 0.4D;
+    private void knockbackSetup()
+    {
+    	knockbackSprintVertical = getDouble( "knockback.sprint-vertical", knockbackSprintVertical );
+    	knockbackSprintHorizontal = getDouble( "knockback.sprint-horizontal", knockbackSprintHorizontal );
+    	knockbackResetFallDistance = getBoolean( "knockback.reset-fall-distance", knockbackResetFallDistance );
+    	knockbackForceAndHeight = getDouble( "knockback.force", knockbackForceAndHeight );
+    	knockbackVerticalLimit = getDouble( "knockback.vertical-limit", knockbackVerticalLimit );
+    }
+    
+    public boolean fixArrowVelocity = true;
+	private void fixArrowVelocity() {
+		fixArrowVelocity = getBoolean("fix-arrow-velocity", fixArrowVelocity);
+	}
 }

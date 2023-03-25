@@ -954,7 +954,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
 
                     if (flag2) {
                         if (i > 0) {
-                            entity.g((double) (-MathHelper.sin((float) (this.yaw * Math.PI / 180.0F)) * (float) i * 0.5F), 0.1D, (double) (MathHelper.cos((float) (this.yaw * Math.PI / 180.0F)) * (float) i * 0.5F));
+                        	entity.g((double) (-MathHelper.sin(this.yaw * 3.1415927F / 180.0F) * (float) i * world.paperSpigotConfig.knockbackSprintHorizontal), world.paperSpigotConfig.knockbackSprintVertical, (double) (MathHelper.cos(this.yaw * 3.1415927F / 180.0F) * (float) i * world.paperSpigotConfig.knockbackSprintHorizontal));
                             this.motX *= 0.6D;
                             this.motZ *= 0.6D;
                             this.setSprinting(false);
@@ -976,7 +976,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
                             this.world.getServer().getPluginManager().callEvent(event);
                             if (!event.isCancelled()) {
                                 if(!vector.equals(event.getVelocity())) player.setVelocity(event.getVelocity());
-                                if (entity.motY > 0) entity.fallDistance = 0.0f;
+                                if (world.paperSpigotConfig.knockbackResetFallDistance && entity.motY > 0) entity.fallDistance = 0.0f;
                                 ((EntityPlayer) entity).playerConnection.sendPacket(new PacketPlayOutEntityVelocity(entity));
                                 entity.velocityChanged = false;
                                 entity.motX = victimMotX;

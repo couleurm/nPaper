@@ -23,4 +23,5 @@ jobs:
     - name: Upload release
       uses: softprops/action-gh-release@v1
       with:
+        name: "Test"
         files: ./nPaper-Server/target/npaper-1.7.10-R0.1-SNAPSHOT.jar

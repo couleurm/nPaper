@@ -42,7 +42,7 @@ public enum InventoryType {
      * A player's inventory, with 9 QUICKBAR slots, 27 CONTAINER slots, and 4
      * ARMOR slots. The ARMOUR slots may not be visible to the player, though.
      */
-    PLAYER(36,"Player"),
+    PLAYER(40,"Player"), // nPaper - add the 4 ARMOR slot
     /**
      * The creative mode inventory, with only 9 QUICKBAR slots and nothing
      * else. (The actual creative interface with the items is client-side and

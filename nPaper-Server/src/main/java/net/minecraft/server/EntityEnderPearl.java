@@ -26,7 +26,12 @@ public class EntityEnderPearl extends EntityProjectile {
 
     // nPaper start - antipearl glitch
     public void h() {
-        if (PaperSpigotConfig.fixEnderPearlGlitch && this.world.getCubes(this, this.boundingBox.grow(0.25D, 0.25D, 0.25D)).isEmpty()) {
+    	final EntityLiving entityliving = this.getShooter();
+        if (entityliving != null && entityliving instanceof EntityHuman && !entityliving.isAlive()) {
+            this.die();
+            return;
+        }
+        if (PaperSpigotConfig.fixEnderPearlGlitch && this.world.getCubes(this, this.boundingBox.grow(0.225D, 0.1D, 0.225D)).isEmpty()) {
             this.lastValidLocation = getBukkitEntity().getLocation();
         }
         super.h();

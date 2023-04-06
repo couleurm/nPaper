@@ -171,6 +171,7 @@ public abstract class Entity {
         this.datawatcher.a(0, Byte.valueOf((byte) 0));
         this.datawatcher.a(1, Short.valueOf((short) 300));
         this.c();
+        this.datawatcher.registrationLocked = true; // PandaSpigot
     }
 
     protected abstract void c();

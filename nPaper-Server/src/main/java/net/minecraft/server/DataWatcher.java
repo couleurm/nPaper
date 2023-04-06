@@ -1,15 +1,13 @@
 package net.minecraft.server;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.spigotmc.ProtocolData; // Spigot - protocol patch
 
 import net.minecraft.util.org.apache.commons.lang3.ObjectUtils;
-import org.spigotmc.ProtocolData; // Spigot - protocol patch
 
 public class DataWatcher {
 
@@ -23,13 +21,14 @@ public class DataWatcher {
     private final Map d = net.minecraft.util.gnu.trove.TDecorators.wrap( dataValues );
     // Spigot End
     private boolean e;
-    private ReadWriteLock f = new ReentrantReadWriteLock();
 
     public DataWatcher(Entity entity) {
         this.a = entity;
     }
 
+    boolean registrationLocked; // PandaSpigot
     public void a(int i, Object object) {
+    	if (registrationLocked) throw new IllegalStateException("Registering datawatcher object after entity initialization"); // PandaSpigot
         int integer = classToId.get(object.getClass()); // Spigot
 
         // Spigot start - protocol patch
@@ -54,9 +53,7 @@ public class DataWatcher {
         } else {
             WatchableObject watchableobject = new WatchableObject(integer, i, object); // Spigot
 
-            this.f.writeLock().lock();
             this.dataValues.put(i, watchableobject); // Spigot
-            this.f.writeLock().unlock();
             this.b = false;
         }
     }
@@ -64,9 +61,7 @@ public class DataWatcher {
     public void add(int i, int j) {
         WatchableObject watchableobject = new WatchableObject(j, i, null);
 
-        this.f.writeLock().lock();
         this.dataValues.put(i, watchableobject); // Spigot
-        this.f.writeLock().unlock();
         this.b = false;
     }
 
@@ -107,22 +102,7 @@ public class DataWatcher {
     // Spigot end
 
     private WatchableObject i(int i) {
-        this.f.readLock().lock();
-
-        WatchableObject watchableobject;
-
-        try {
-            watchableobject = (WatchableObject) this.dataValues.get(i); // Spigot
-        } catch (Throwable throwable) {
-            CrashReport crashreport = CrashReport.a(throwable, "Getting synched entity data");
-            CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Synched entity data");
-
-            crashreportsystemdetails.a("Data ID", Integer.valueOf(i));
-            throw new ReportedException(crashreport);
-        }
-
-        this.f.readLock().unlock();
-        return watchableobject;
+        return (WatchableObject) this.dataValues.get(i);
     }
 
     public void watch(int i, Object object) {
@@ -169,7 +149,6 @@ public class DataWatcher {
         ArrayList arraylist = null;
 
         if (this.e) {
-            this.f.readLock().lock();
             Iterator iterator = this.dataValues.valueCollection().iterator(); // Spigot
 
             while (iterator.hasNext()) {
@@ -195,8 +174,6 @@ public class DataWatcher {
                     arraylist.add(watchableobject);
                 }
             }
-
-            this.f.readLock().unlock();
         }
 
         this.e = false;
@@ -210,7 +187,6 @@ public class DataWatcher {
 
     public void a(PacketDataSerializer packetdataserializer, int version) {
     // Spigot end
-        this.f.readLock().lock();
         Iterator iterator = this.dataValues.valueCollection().iterator(); // Spigot
 
         while (iterator.hasNext()) {
@@ -219,14 +195,11 @@ public class DataWatcher {
             a(packetdataserializer, watchableobject, version); // Spigot - protocol patch
         }
 
-        this.f.readLock().unlock();
         packetdataserializer.writeByte(127);
     }
 
     public List c() {
         ArrayList arraylist = new ArrayList(); // Spigot
-
-        this.f.readLock().lock();
 
         arraylist.addAll(this.dataValues.valueCollection()); // Spigot
         // Spigot start - copy ItemStacks to prevent ConcurrentModificationExceptions
@@ -245,7 +218,6 @@ public class DataWatcher {
         }
         // Spigot end
 
-        this.f.readLock().unlock();
         return arraylist;
     }
 

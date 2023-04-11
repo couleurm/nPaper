@@ -302,8 +302,6 @@ public abstract class PlayerList {
                 this.server.getPlayerList().sendAll(new PacketPlayOutChat(line));
             }
         }
-        this.cserver.onPlayerJoin(playerJoinEvent.getPlayer());
-
         ChunkIOExecutor.adjustPoolSize(this.getPlayerCount());
         // CraftBukkit end
 

@@ -50,7 +50,7 @@ public class ItemBucket extends Item {
                     Material material = world.getType(i, j, k).getMaterial();
                     int l = world.getData(i, j, k);
 
-                    if ((material == Material.WATER || material == Material.LAVA) && l == 0) {
+                    if (material.isLiquid() && l == 0) {
                     	final Item bucketType = (material == Material.LAVA ? Items.LAVA_BUCKET : Items.WATER_BUCKET);
                         // CraftBukkit start
                         PlayerBucketFillEvent event = CraftEventFactory.callPlayerBucketFillEvent(entityhuman, i, j, k, -1, itemstack, bucketType);

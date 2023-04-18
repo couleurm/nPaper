@@ -15,7 +15,7 @@ public class DataWatcher {
     private boolean b = true;
     // Spigot Start
     private static final net.minecraft.util.gnu.trove.map.TObjectIntMap classToId = new net.minecraft.util.gnu.trove.map.hash.TObjectIntHashMap( 10, 0.5f, -1 );
-    private final net.minecraft.util.gnu.trove.map.TIntObjectMap dataValues = new net.minecraft.util.gnu.trove.map.hash.TIntObjectHashMap( 10, 0.5f, -1 );
+    private final net.minecraft.util.gnu.trove.map.TIntObjectMap<WatchableObject> dataValues = new net.minecraft.util.gnu.trove.map.hash.TIntObjectHashMap<WatchableObject>( 10, 0.5f, -1 );
     // These exist as an attempt at backwards compatability for (broken) NMS plugins
     private static final Map c = net.minecraft.util.gnu.trove.TDecorators.wrap( classToId );
     private final Map d = net.minecraft.util.gnu.trove.TDecorators.wrap( dataValues );
@@ -145,11 +145,11 @@ public class DataWatcher {
         packetdataserializer.writeByte(127);
     }
 
-    public List b() {
-        ArrayList arraylist = null;
+    public List<WatchableObject> b() {
+        ArrayList<WatchableObject> arraylist = null;
 
         if (this.e) {
-            Iterator iterator = this.dataValues.valueCollection().iterator(); // Spigot
+            Iterator<WatchableObject> iterator = this.dataValues.valueCollection().iterator(); // Spigot
 
             while (iterator.hasNext()) {
                 WatchableObject watchableobject = (WatchableObject) iterator.next();
@@ -157,7 +157,7 @@ public class DataWatcher {
                 if (watchableobject.d()) {
                     watchableobject.a(false);
                     if (arraylist == null) {
-                        arraylist = new ArrayList();
+                        arraylist = new ArrayList<WatchableObject>();
                     }
 
                     // Spigot start - copy ItemStacks to prevent ConcurrentModificationExceptions
@@ -198,8 +198,8 @@ public class DataWatcher {
         packetdataserializer.writeByte(127);
     }
 
-    public List c() {
-        ArrayList arraylist = new ArrayList(); // Spigot
+    public List<WatchableObject> c() {
+        ArrayList<WatchableObject> arraylist = new ArrayList(); // Spigot
 
         arraylist.addAll(this.dataValues.valueCollection()); // Spigot
         // Spigot start - copy ItemStacks to prevent ConcurrentModificationExceptions
@@ -287,12 +287,12 @@ public class DataWatcher {
     }
     // Spigot end
 
-    public static List b(PacketDataSerializer packetdataserializer) {
-        ArrayList arraylist = null;
+    public static List<WatchableObject> b(PacketDataSerializer packetdataserializer) {
+        ArrayList<WatchableObject> arraylist = null;
 
         for (byte b0 = packetdataserializer.readByte(); b0 != 127; b0 = packetdataserializer.readByte()) {
             if (arraylist == null) {
-                arraylist = new ArrayList();
+                arraylist = new ArrayList<WatchableObject>();
             }
 
             int i = (b0 & 224) >> 5;

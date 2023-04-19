@@ -23,9 +23,9 @@ public class PacketPlayOutSpawnEntityLiving extends Packet {
     public PacketPlayOutSpawnEntityLiving(EntityLiving entityliving) {
         this.a = entityliving.getId();
         this.b = (byte) EntityTypes.a(entityliving);
-        this.c = entityliving.as.a(entityliving.locX);
+        this.c = MathHelper.floor(entityliving.locX * 32.0D);
         this.d = MathHelper.floor(entityliving.locY * 32.0D);
-        this.e = entityliving.as.a(entityliving.locZ);
+        this.e = MathHelper.floor(entityliving.locZ * 32.0D);
         this.i = (byte) ((int) (entityliving.yaw * 256.0F / 360.0F));
         this.j = (byte) ((int) (entityliving.pitch * 256.0F / 360.0F));
         this.k = (byte) ((int) (entityliving.aO * 256.0F / 360.0F));

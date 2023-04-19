@@ -1,16 +1,13 @@
 package net.minecraft.server;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.Sets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 // CraftBukkit start
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerVelocityEvent;
@@ -50,9 +47,9 @@ public class EntityTrackerEntry {
         this.b = i;
         this.c = j;
         this.u = flag;
-        this.xLoc = MathHelper.floor(entity.locX * 32.0D);
-        this.yLoc = MathHelper.floor(entity.locY * 32.0D);
-        this.zLoc = MathHelper.floor(entity.locZ * 32.0D);
+        this.xLoc = (int) Math.round(entity.locX * 32.0D);
+        this.yLoc = (int) Math.round(entity.locY * 32.0D);
+        this.zLoc = (int) Math.round(entity.locZ * 32.0D);
         this.yRot = MathHelper.d(entity.yaw * 256.0F / 360.0F);
         this.xRot = MathHelper.d(entity.pitch * 256.0F / 360.0F);
         this.i = MathHelper.d(entity.getHeadRotation() * 256.0F / 360.0F);
@@ -110,9 +107,9 @@ public class EntityTrackerEntry {
 
             if (this.tracker.vehicle == null) {
                 ++this.v;
-                i = this.tracker.as.a(this.tracker.locX);
-                j = MathHelper.floor(this.tracker.locY * 32.0D);
-                int k = this.tracker.as.a(this.tracker.locZ);
+                i = (int) Math.round(this.tracker.locX * 32.0D);
+                j = (int) Math.round(this.tracker.locY * 32.0D);
+                int k = (int) Math.round(this.tracker.locZ * 32.0D);
                 int l = MathHelper.d(this.tracker.yaw * 256.0F / 360.0F);
                 int i1 = MathHelper.d(this.tracker.pitch * 256.0F / 360.0F);
                 int j1 = i - this.xLoc;
@@ -218,9 +215,9 @@ public class EntityTrackerEntry {
                     this.xRot = j;
                 }
 
-                this.xLoc = this.tracker.as.a(this.tracker.locX);
-                this.yLoc = MathHelper.floor(this.tracker.locY * 32.0D);
-                this.zLoc = this.tracker.as.a(this.tracker.locZ);
+                this.xLoc = (int) Math.round(this.tracker.locX * 32.0D);
+                this.yLoc = (int) Math.round(this.tracker.locY * 32.0D);
+                this.zLoc = (int) Math.round(this.tracker.locZ * 32.0D);
                 this.b();
                 this.x = true;
             }

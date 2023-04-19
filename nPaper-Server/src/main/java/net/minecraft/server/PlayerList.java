@@ -385,43 +385,32 @@ public abstract class PlayerList {
         // CraftBukkit end
     }
 
-    // CraftBukkit start - Whole method, SocketAddress to LoginListener, added hostname to signature, return EntityPlayer
+ // CraftBukkit start - Whole method, SocketAddress to LoginListener, added hostname to signature, return EntityPlayer
     public EntityPlayer attemptLogin(LoginListener loginlistener, GameProfile gameprofile, String hostname) {
         // Instead of kicking then returning, we need to store the kick reason
         // in the event, check with plugins to see if it's ok, and THEN kick
         // depending on the outcome.
-        SocketAddress socketaddress = loginlistener.networkManager.getSocketAddress();
+        final SocketAddress socketaddress = loginlistener.networkManager.getSocketAddress();
 
-        EntityPlayer entity = new EntityPlayer(this.server, this.server.getWorldServer(0), gameprofile, new PlayerInteractManager(this.server.getWorldServer(0)));
-        Player player = entity.getBukkitEntity();
-        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((java.net.InetSocketAddress) socketaddress).getAddress(), ((java.net.InetSocketAddress) loginlistener.networkManager.getRawAddress()).getAddress());
-        String s;
+        final EntityPlayer entity = new EntityPlayer(this.server, this.server.getWorldServer(0), gameprofile, new PlayerInteractManager(this.server.getWorldServer(0)));
+        final Player player = entity.getBukkitEntity();
+        final PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((java.net.InetSocketAddress) socketaddress).getAddress(), ((java.net.InetSocketAddress) loginlistener.networkManager.getRawAddress()).getAddress());
 
-        if (this.j.isBanned(gameprofile) && !this.j.get(gameprofile).hasExpired()) {
-            GameProfileBanEntry gameprofilebanentry = (GameProfileBanEntry) this.j.get(gameprofile);
-
-            s = "You are banned from this server!\nReason: " + gameprofilebanentry.getReason();
-            if (gameprofilebanentry.getExpires() != null) {
-                s = s + "\nYour ban will be removed on " + h.format(gameprofilebanentry.getExpires());
-            }
-
-            // return s;
-            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, s); // Spigot
+        // Paper start - Fix MC-158900
+        GameProfileBanEntry gameprofilebanentry;
+        if (getProfileBans().isBanned(gameprofile) && (gameprofilebanentry = (GameProfileBanEntry) getProfileBans().get(gameprofile)) != null) {
+        // Paper end
+            if (!gameprofilebanentry.hasExpired()) event.disallow(PlayerLoginEvent.Result.KICK_BANNED, "You are banned from this server!" + 
+      			  												"\nReason: " + gameprofilebanentry.getReason() +
+      			  												(gameprofilebanentry.getExpires() != null ? "\nYour ban will be removed on " + h.format(gameprofilebanentry.getExpires()) : "")); // Spigot
         } else if (!this.isWhitelisted(gameprofile)) {
-            // return "You are not white-listed on this server!";
             event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, org.spigotmc.SpigotConfig.whitelistMessage); // Spigot
         } else if (this.k.isBanned(socketaddress) && !this.k.get(socketaddress).hasExpired()) { // Spigot
-            IpBanEntry ipbanentry = this.k.get(socketaddress);
-
-            s = "Your IP address is banned from this server!\nReason: " + ipbanentry.getReason();
-            if (ipbanentry.getExpires() != null) {
-                s = s + "\nYour ban will be removed on " + h.format(ipbanentry.getExpires());
-            }
-
-            // return s;
-            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, s);
+            final IpBanEntry ipbanentry = this.k.get(socketaddress);
+            event.disallow(PlayerLoginEvent.Result.KICK_BANNED, "Your IP address is banned from this server!" + 
+            													"\nReason: " + ipbanentry.getReason() +
+            													(ipbanentry.getExpires() != null ? "\nYour ban will be removed on " + h.format(ipbanentry.getExpires()) : ""));
         } else {
-            // return this.players.size() >= this.maxPlayers ? "The server is full!" : null;
             if (this.players.size() >= this.maxPlayers && (!player.isOp() && !player.hasPermission("bukkit.whitelist.bypass"))) { // Rinny allow to join server even if its full
                 event.disallow(PlayerLoginEvent.Result.KICK_FULL, org.spigotmc.SpigotConfig.serverFullMessage); // Spigot
             }
@@ -439,8 +428,6 @@ public abstract class PlayerList {
 
     public EntityPlayer processLogin(GameProfile gameprofile, EntityPlayer player) { // CraftBukkit - added EntityPlayer
         UUID uuid = EntityHuman.a(gameprofile);
-        ArrayList arraylist = Lists.newArrayList();
-
         EntityPlayer entityplayer;
 
         /* // PaperSpigot start - Use exact lookup below

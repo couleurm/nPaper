@@ -883,15 +883,16 @@ public abstract class EntityLiving extends Entity {
             this.al = true;
             // Rinny start - configurable knockback
             double magnitude = MathHelper.sqrt(d0 * d0 + d1 * d1);
-            double d2 = this.world.paperSpigotConfig.knockbackForceAndHeight;
+            final double knockbackReduction = getBukkitEntity().getKnockbackReduction();
+            final double force = (world.paperSpigotConfig.knockbackForceAndHeight * (1.0D - knockbackReduction));
 
             this.motX /= 2.0;
             this.motY /= 2.0;
             this.motZ /= 2.0;
 
-            this.motX -= d0 / magnitude * d2;
-            this.motY = MathHelper.limit(this.motY + d2, 0.05D, this.world.paperSpigotConfig.knockbackVerticalLimit);
-            this.motZ -= d1 / magnitude * d2;
+            this.motX -= d0 / magnitude * force;
+            this.motY = MathHelper.limit(this.motY + force, 0.05D, this.world.paperSpigotConfig.knockbackVerticalLimit);
+            this.motZ -= d1 / magnitude * force;
             // Rinny end
         }
     }

@@ -3,39 +3,35 @@ package net.minecraft.server;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-
 // PaperSpigot start
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.HashMap;
-import java.util.Map;
-import net.minecraft.util.com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.bukkit.craftbukkit.CraftChunk;
-// PaperSpigot end
 
 // CraftBukkit start
 import org.bukkit.Bukkit;
 import org.bukkit.block.BlockState;
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.util.LongHashSet;
-import org.bukkit.craftbukkit.SpigotTimings; // Spigot
-import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.SpigotTimings; // Spigot
 import org.bukkit.craftbukkit.event.CraftEventFactory;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.weather.ThunderChangeEvent;
 // CraftBukkit end
+import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.generator.ChunkGenerator;
+
+import net.minecraft.util.com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public abstract class World implements IBlockAccess {
 
@@ -2276,30 +2272,35 @@ public abstract class World implements IBlockAccess {
     protected void C() {
         // this.chunkTickList.clear(); // CraftBukkit - removed
         this.methodProfiler.a("buildList");
-
-        int i;
-        EntityHuman entityhuman;
+        
+        // Rinny - Moved down
+        /*
         int j;
         int k;
         int l;
-
+        */
+        // Rinny
+        
         // Spigot start
-        int optimalChunks = spigotConfig.chunksPerTick;
+        final int optimalChunks = spigotConfig.chunksPerTick;
         // Quick conditions to allow us to exist early
         if ( optimalChunks <= 0 || players.isEmpty() )
         {
             return;
         }
+        // Rinny - Moved - dont init variable when not needed
+        int j;
+        int k;
+        int l;
+        // Rinny - Moved
         // Keep chunks with growth inside of the optimal chunk range
-        int chunksPerPlayer = Math.min( 200, Math.max( 1, (int) ( ( ( optimalChunks - players.size() ) / (double) players.size() ) + 0.5 ) ) );
-        int randRange = 3 + chunksPerPlayer / 30;
+        final int chunksPerPlayer = Math.min(200, Math.max(1, (int) Math.ceil(((optimalChunks - players.size()) / (double) players.size())))); // Rinny - reduce the number of floating-point operations that result in faster code
         // Limit to normal tick radius - including view distance
-        randRange = ( randRange > chunkTickRadius ) ? chunkTickRadius : randRange;
+        final int randRange = Math.min(3 + chunksPerPlayer / 30, chunkTickRadius);
         // odds of growth happening vs growth happening in vanilla
         this.growthOdds = this.modifiedOdds = Math.max( 35, Math.min( 100, ( ( chunksPerPlayer + 1 ) * 100F ) / 15F ) );
         // Spigot end
-        for (i = 0; i < this.players.size(); ++i) {
-            entityhuman = (EntityHuman) this.players.get(i);
+        for (EntityHuman entityhuman : (List<EntityHuman>) this.players) {
             j = MathHelper.floor(entityhuman.locX / 16.0D);
             k = MathHelper.floor(entityhuman.locZ / 16.0D);
             l = this.p();
@@ -2330,8 +2331,8 @@ public abstract class World implements IBlockAccess {
 
         this.methodProfiler.a("playerCheckLight");
         if (spigotConfig.randomLightUpdates && !this.players.isEmpty()) { // Spigot
-            i = this.random.nextInt(this.players.size());
-            entityhuman = (EntityHuman) this.players.get(i);
+        	final int i = this.random.nextInt(this.players.size());
+            final EntityHuman entityhuman = (EntityHuman) this.players.get(i);
             j = MathHelper.floor(entityhuman.locX) + this.random.nextInt(11) - 5;
             k = MathHelper.floor(entityhuman.locY) + this.random.nextInt(11) - 5;
             l = MathHelper.floor(entityhuman.locZ) + this.random.nextInt(11) - 5;

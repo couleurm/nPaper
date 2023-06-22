@@ -120,7 +120,6 @@ public abstract class Entity {
     protected int aq;
     private boolean invulnerable;
     public UUID uniqueID; // CraftBukkit - protected -> public
-    public EnumEntitySize as;
     public boolean valid; // CraftBukkit
     public org.bukkit.projectiles.ProjectileSource projectileSource; // CraftBukkit - For projectiles only
     public boolean inUnloadedChunk = false; // PaperSpigot - Remove entities in unloaded chunks
@@ -155,7 +154,6 @@ public abstract class Entity {
         this.maxFireTicks = 1;
         this.justCreated = true;
         this.uniqueID = new UUID(random.nextLong(), random.nextLong()); // Spigot
-        this.as = EnumEntitySize.SIZE_2;
         this.world = world;
         this.setPosition(0.0D, 0.0D, 0.0D);
         if (world != null) {
@@ -171,6 +169,7 @@ public abstract class Entity {
         this.datawatcher.a(0, Byte.valueOf((byte) 0));
         this.datawatcher.a(1, Short.valueOf((short) 300));
         this.c();
+        this.datawatcher.registrationLocked = true; // PandaSpigot
     }
 
     protected abstract void c();
@@ -204,21 +203,6 @@ public abstract class Entity {
             if (this.width > f2 && !this.justCreated && !this.world.isStatic) {
                 this.move((double) (f2 - this.width), 0.0D, (double) (f2 - this.width));
             }
-        }
-
-        f2 = f % 2.0F;
-        if ((double) f2 < 0.375D) {
-            this.as = EnumEntitySize.SIZE_1;
-        } else if ((double) f2 < 0.75D) {
-            this.as = EnumEntitySize.SIZE_2;
-        } else if ((double) f2 < 1.0D) {
-            this.as = EnumEntitySize.SIZE_3;
-        } else if ((double) f2 < 1.375D) {
-            this.as = EnumEntitySize.SIZE_4;
-        } else if ((double) f2 < 1.75D) {
-            this.as = EnumEntitySize.SIZE_5;
-        } else {
-            this.as = EnumEntitySize.SIZE_6;
         }
     }
 

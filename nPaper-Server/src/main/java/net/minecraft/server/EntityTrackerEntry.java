@@ -1,20 +1,18 @@
 package net.minecraft.server;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.Sets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 // CraftBukkit start
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerVelocityEvent;
 // CraftBukkit end
+import org.github.paperspigot.PaperSpigotConfig;
 
 public class EntityTrackerEntry {
 
@@ -49,9 +47,9 @@ public class EntityTrackerEntry {
         this.b = i;
         this.c = j;
         this.u = flag;
-        this.xLoc = MathHelper.floor(entity.locX * 32.0D);
-        this.yLoc = MathHelper.floor(entity.locY * 32.0D);
-        this.zLoc = MathHelper.floor(entity.locZ * 32.0D);
+        this.xLoc = (int) Math.floor(entity.locX * 32.0D);
+        this.yLoc = (int) Math.floor(entity.locY * 32.0D);
+        this.zLoc = (int) Math.floor(entity.locZ * 32.0D);
         this.yRot = MathHelper.d(entity.yaw * 256.0F / 360.0F);
         this.xRot = MathHelper.d(entity.pitch * 256.0F / 360.0F);
         this.i = MathHelper.d(entity.getHeadRotation() * 256.0F / 360.0F);
@@ -109,9 +107,9 @@ public class EntityTrackerEntry {
 
             if (this.tracker.vehicle == null) {
                 ++this.v;
-                i = this.tracker.as.a(this.tracker.locX);
-                j = MathHelper.floor(this.tracker.locY * 32.0D);
-                int k = this.tracker.as.a(this.tracker.locZ);
+                i = (int) Math.floor(this.tracker.locX * 32.0D);
+                j = (int) Math.floor(this.tracker.locY * 32.0D);
+                int k = (int) Math.floor(this.tracker.locZ * 32.0D);
                 int l = MathHelper.d(this.tracker.yaw * 256.0F / 360.0F);
                 int i1 = MathHelper.d(this.tracker.pitch * 256.0F / 360.0F);
                 int j1 = i - this.xLoc;
@@ -217,9 +215,9 @@ public class EntityTrackerEntry {
                     this.xRot = j;
                 }
 
-                this.xLoc = this.tracker.as.a(this.tracker.locX);
-                this.yLoc = MathHelper.floor(this.tracker.locY * 32.0D);
-                this.zLoc = this.tracker.as.a(this.tracker.locZ);
+                this.xLoc = (int) Math.floor(this.tracker.locX * 32.0D);
+                this.yLoc = (int) Math.floor(this.tracker.locY * 32.0D);
+                this.zLoc = (int) Math.floor(this.tracker.locZ * 32.0D);
                 this.b();
                 this.x = true;
             }
@@ -265,7 +263,36 @@ public class EntityTrackerEntry {
         DataWatcher datawatcher = this.tracker.getDataWatcher();
 
         if (datawatcher.a()) {
-            this.broadcastIncludingSelf(new PacketPlayOutEntityMetadata(this.tracker.getId(), datawatcher, false));
+        	if (PaperSpigotConfig.obfuscatePlayerHealth && this.tracker instanceof EntityHuman) {
+        		final List<WatchableObject> changedMetadata = datawatcher.c(); // Clone the data watcher elements
+        		final Iterator<WatchableObject> iterator = changedMetadata.iterator();
+        		boolean found = false;
+        		// We iterate over every data watcher element
+        		while (iterator.hasNext()) {
+        			WatchableObject watchable = iterator.next();
+        			// If the index is 6 (player health) we can replace it with an obfuscated value. We have to make sure the health is also over 0 otherwise death animations won't show
+        			// https://wiki.vg/index.php?title=Entity_metadata&oldid=7415#Living_Entity_Base
+        			if (watchable.a() == 6 && (float) watchable.b() > 0) {
+        				iterator.remove();
+        				found = true;
+        				break; // Rinny - cut the loop
+        			}
+        		}
+        		// Put in the fake hp value
+        		if (found) {
+        			changedMetadata.add(new WatchableObject(3, 6, 1.0F));
+        		}
+        		// Create a new packet with the obfuscated player health
+        		final PacketPlayOutEntityMetadata modifiedPacket = new PacketPlayOutEntityMetadata(this.tracker.getId(), changedMetadata);
+        		// Broadcast the modified metadata packet to everyone and send the correct packet to the player
+        		this.broadcast(modifiedPacket);
+        		if (this.tracker instanceof EntityPlayer) {
+        			((EntityPlayer) this.tracker).playerConnection.sendPacket(new PacketPlayOutEntityMetadata(this.tracker.getId(), datawatcher, false));
+        		}
+        	} else {
+        		// SportPaper end
+        		this.broadcastIncludingSelf(new PacketPlayOutEntityMetadata(this.tracker.getId(), datawatcher, false));
+        	}
         }
 
         if (this.tracker instanceof EntityLiving) {

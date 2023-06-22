@@ -14,11 +14,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.BitSet;
 
 public class SpigotDebreakifier
 {
 
-    private static final boolean[] validBlocks = new boolean[ 198 << 4 ];
+	private static final BitSet validBlocks = new BitSet(198 << 4); // Rinny - Better memory-efficient storing
     private static final int[] correctedValues = new int[ 198 ];
 
     static
@@ -33,7 +34,7 @@ public class SpigotDebreakifier
                 String[] parts = entry.getAsString().split( ":" );
                 int id = Integer.parseInt( parts[ 0 ] );
                 int data = Integer.parseInt( parts[ 1 ] );
-                validBlocks[ ( id << 4 ) | data ] = true;
+                validBlocks.set((id << 4) | data, true); // Rinny
                 if ( correctedValues[ id ] == -1 || data < correctedValues[ id ] )
                 {
                     correctedValues[ id ] = data;
@@ -58,13 +59,10 @@ public class SpigotDebreakifier
         {
             data = 8;
         }
-        if ( validBlocks[ ( id << 4 ) | data ] )
-        {
+        if (validBlocks.get((id << 4) | data)) { // Rinny
             return data;
-        } else
-        {
-            return correctedValues[ id ] & 0xF;
         }
+        return correctedValues[ id ] & 0xF;
     }
 
     private static TIntIntHashMap invalidItems = new TIntIntHashMap();

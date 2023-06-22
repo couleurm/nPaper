@@ -59,9 +59,26 @@ public class EntityExperienceOrb extends Entity {
         this.j(this.locX, (this.boundingBox.b + this.boundingBox.e) / 2.0D, this.locZ);
         double d0 = 8.0D;
 
+        EntityHuman foundTarget = null;
+        boolean wasCancelled = false;
         if (this.targetTime < this.a - 20 + this.getId() % 100) {
             if (this.targetPlayer == null || this.targetPlayer.f(this) > d0 * d0) {
-                this.targetPlayer = this.world.findNearbyPlayer(this, d0);
+            	foundTarget = this.world.findNearbyPlayer(this, d0);
+                if(foundTarget == null) {
+                    this.targetPlayer = foundTarget;
+                } else if (foundTarget != null && !foundTarget.equals(this.targetPlayer)) {
+                    // CraftBukkit start
+                    EntityTargetEvent event = CraftEventFactory.callEntityTargetEvent(this, foundTarget, EntityTargetEvent.TargetReason.CLOSEST_PLAYER);
+                    Entity target = event.getTarget() == null ? null : ((org.bukkit.craftbukkit.entity.CraftEntity) event.getTarget()).getHandle();
+                    if (!(event.isCancelled())) {
+                        if (target == null) {
+                            this.targetPlayer = null;
+                        } else if (target instanceof EntityHuman) {
+                            this.targetPlayer = (EntityHuman) target;
+                        }
+                    }
+                    // CraftBukkit end
+                }
             }
 
             this.targetTime = this.a;
@@ -73,7 +90,7 @@ public class EntityExperienceOrb extends Entity {
             Entity target = event.getTarget() == null ? null : ((org.bukkit.craftbukkit.entity.CraftEntity) event.getTarget()).getHandle();
 
             if (!event.isCancelled() && target != null) {
-                double d1 = (target.locX - this.locX) / d0;
+            	double d1 = (target.locX - this.locX) / d0;
                 double d2 = (target.locY + (double) target.getHeadHeight() - this.locY) / d0;
                 double d3 = (target.locZ - this.locZ) / d0;
                 double d4 = Math.sqrt(d1 * d1 + d2 * d2 + d3 * d3);
@@ -104,9 +121,12 @@ public class EntityExperienceOrb extends Entity {
 
         ++this.a;
         ++this.b;
-        if (this.b >= 6000) {
+        if (this.b >= this.world.spigotConfig.expDespawnRate) { // Rinny - add ExpDespawnRate :)
             this.die();
-        }
+        } else if (wasCancelled) { // Reduce desync
+        	EntityTrackerEntry tracker = (EntityTrackerEntry)((WorldServer)this.world).tracker.trackedEntities.get(getId());
+        	tracker.broadcast(new PacketPlayOutRelEntityMove(getId(), (byte)(MathHelper.floor(this.locX * 32.0D) - tracker.xLoc), (byte)(MathHelper.floor(this.locY * 32.0D) - tracker.yLoc), (byte)(MathHelper.floor(this.locZ * 32.0D) - tracker.zLoc), this.onGround));
+        } 
     }
 
     public boolean N() {
@@ -120,27 +140,25 @@ public class EntityExperienceOrb extends Entity {
     public boolean damageEntity(DamageSource damagesource, float f) {
         if (this.isInvulnerable()) {
             return false;
-        } else {
-            this.Q();
-            this.d = (int) ((float) this.d - f);
-            if (this.d <= 0) {
-                this.die();
-            }
-
-            return false;
         }
+        this.Q();
+        this.d = (int) ((float) this.d - f);
+        if (this.d <= 0) {
+            this.die();
+        }
+        return false;
     }
 
     public void b(NBTTagCompound nbttagcompound) {
         nbttagcompound.setShort("Health", (short) ((byte) this.d));
         nbttagcompound.setShort("Age", (short) this.b);
-        nbttagcompound.setShort("Value", (short) this.value);
+        nbttagcompound.setInt("Value", this.value);
     }
 
     public void a(NBTTagCompound nbttagcompound) {
         this.d = nbttagcompound.getShort("Health") & 255;
         this.b = nbttagcompound.getShort("Age");
-        this.value = nbttagcompound.getShort("Value");
+        this.value = nbttagcompound.getInt("Value");
     }
 
     public void b_(EntityHuman entityhuman) {

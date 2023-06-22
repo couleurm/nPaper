@@ -41,8 +41,13 @@ public class CraftTravelAgent extends PortalTravelAgent implements TravelAgent {
     }
 
     public Location findPortal(Location location) {
-        PortalTravelAgent pta = ((CraftWorld) location.getWorld()).getHandle().getTravelAgent();
-        ChunkCoordinates found = pta.findPortal(location.getX(), location.getY(), location.getZ(), this.getSearchRadius());
+        final PortalTravelAgent pta = ((CraftWorld) location.getWorld()).getHandle().getTravelAgent();
+        // PandaSpigot
+        ChunkCoordinates found = pta.findPortal(location.getX(), location.getY(), location.getZ(), 10);
+        if (found == null) {
+       	   found = pta.findPortal(location.getX(), location.getY(), location.getZ(), this.getSearchRadius());
+        }
+        // PandaSpigot
         return found != null ? new Location(location.getWorld(), found.x, found.y, found.z, location.getYaw(), location.getPitch()) : null;
     }
 

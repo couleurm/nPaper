@@ -5,9 +5,17 @@ import java.util.List;
 public class PacketPlayOutEntityMetadata extends Packet {
 
     private int a;
-    private List b;
+    private List<WatchableObject> b;
 
     public PacketPlayOutEntityMetadata() {}
+    
+    // SportPaper start
+ 	public PacketPlayOutEntityMetadata(int i, List<WatchableObject> list) {
+ 		this.a = i;
+ 		this.b = list;
+ 	}
+ 	// SportPaper end
+
 
     public PacketPlayOutEntityMetadata(int i, DataWatcher datawatcher, boolean flag) {
         this.a = i;

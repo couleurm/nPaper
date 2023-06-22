@@ -239,6 +239,13 @@ public class SpigotWorldConfig
         log( "Arrow Despawn Rate: " + arrowDespawnRate );
     }
     
+    public int expDespawnRate = 6000;;
+    private void expDespawnRate()
+    {
+        expDespawnRate = getInt( "exp-despawn-rate", expDespawnRate);
+        log( "Exp Despawn Rate: " + expDespawnRate );
+    }
+    
     public boolean antiXray;
     public int engineMode;
     public List<Integer> hiddenBlocks;

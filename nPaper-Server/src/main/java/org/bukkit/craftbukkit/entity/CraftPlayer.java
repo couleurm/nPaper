@@ -684,7 +684,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         if (fromWorld == toWorld) {
             entity.playerConnection.teleport(to);
         } else {
-            server.getHandle().moveToWorld(entity, toWorld.dimension, true, to, true);
+        	server.getHandle().moveToWorld(entity, toWorld.dimension, true, to, false); // Fix teleportation glitch: https://github.com/IPVP-MC/Paper-1.7/commit/729d4d8e59f79126854d234705973f1d1f1d94ac
         }
 
         // PaperSpigot start

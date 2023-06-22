@@ -429,7 +429,9 @@ public class PlayerConnection implements PacketPlayInListener {
                         }
                     }
                 } else {
-                    this.f = 0;
+                	if (this.f > 0) { // Rinny - dont do useless action
+                		this.f = 0;
+                	}
                 }
 
                 this.player.onGround = packetplayinflying.i();

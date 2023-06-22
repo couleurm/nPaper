@@ -262,4 +262,9 @@ public class PaperSpigotConfig
     private static void logPlayerIp() {
         logPlayerIp = getBoolean("log-player-ip", true);
     }
+    
+    public static boolean obfuscatePlayerHealth = false;
+    private static void obfuscatePlayerHealth() {
+    	obfuscatePlayerHealth = getBoolean("settings.obfuscate-player-health", obfuscatePlayerHealth);
+    }
 }

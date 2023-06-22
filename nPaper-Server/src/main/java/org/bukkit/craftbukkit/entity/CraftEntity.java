@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.metadata.MetadataValue;
@@ -21,6 +20,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     protected final CraftServer server;
     protected Entity entity;
     private EntityDamageEvent lastDamageEvent;
+    private float knockbackReduction = 0.0f;
 
     public CraftEntity(final CraftServer server, final Entity entity) {
         this.server = server;
@@ -276,6 +276,14 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     public Server getServer() {
         return server;
     }
+    
+    public void setKnockbackReduction(float reduction) {
+		this.knockbackReduction = reduction;
+	}
+      
+	public float getKnockbackReduction() {
+		return this.knockbackReduction;
+	}
 
     public Vector getMomentum() {
         return getVelocity();

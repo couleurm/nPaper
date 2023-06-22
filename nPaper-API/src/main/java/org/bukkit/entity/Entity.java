@@ -76,6 +76,20 @@ public interface Entity extends Metadatable {
      * @return True if entity is on ground.
      */
     public boolean isOnGround();
+    
+    /**
+     * Reduction of the knockback.
+     *
+     * @param reduction The new knockback reduction.
+     */
+    public void setKnockbackReduction(float reduction);
+    
+    /**
+     * Gets the actual knockback reduction of the entity
+     *
+     * @return Knockback reduction
+     */
+    public float getKnockbackReduction();
 
     /**
      * Gets the current world this entity resides in

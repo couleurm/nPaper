@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 // CraftBukkit start
@@ -13,8 +15,8 @@ import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 
 class ThreadPlayerLookupUUID implements Runnable {
-
     final LoginListener a;
+    
     ThreadPlayerLookupUUID(LoginListener loginlistener) {
         this.a = loginlistener;
     }
@@ -31,9 +33,9 @@ class ThreadPlayerLookupUUID implements Runnable {
                 return;
             }
             // Spigot End
-            String s = (new BigInteger(MinecraftEncryption.a(LoginListener.b(this.a), LoginListener.c(this.a).K().getPublic(), LoginListener.d(this.a)))).toString(16);
+            String hash = (new BigInteger(MinecraftEncryption.a(LoginListener.b(this.a), LoginListener.c(this.a).K().getPublic(), LoginListener.d(this.a)))).toString(16);
 
-            LoginListener.a(this.a, LoginListener.c(this.a).av().hasJoinedServer(new GameProfile((UUID) null, gameprofile.getName()), s));
+            LoginListener.a(this.a, LoginListener.c(this.a).av().hasJoinedServer(new GameProfile((UUID) null, gameprofile.getName()), hash));
             if (LoginListener.a(this.a) != null) {
                 fireLoginEvents(); // Spigot
             } else if (LoginListener.c(this.a).N()) {
@@ -42,7 +44,7 @@ class ThreadPlayerLookupUUID implements Runnable {
                 LoginListener.a(this.a, EnumProtocolState.READY_TO_ACCEPT);
             } else {
                 this.a.disconnect("Failed to verify username!");
-                LoginListener.e().error("Username \'" + LoginListener.a(this.a).getName() + "\' tried to join with an invalid session");
+                LoginListener.e().error("Username \'" + gameprofile.getName() + "\' tried to join with an invalid session");
             }
         } catch (AuthenticationUnavailableException authenticationunavailableexception) {
             if (LoginListener.c(this.a).N()) {
@@ -56,9 +58,7 @@ class ThreadPlayerLookupUUID implements Runnable {
             // CraftBukkit start - catch all exceptions
         } catch (Exception exception) {
             this.a.disconnect("Failed to verify username!");
-            if (LoginListener.c(this.a) != null && LoginListener.c(this.a).server != null) { // Rinny - Fix NPE
-            	LoginListener.c(this.a).server.getLogger().log(java.util.logging.Level.WARNING, "Exception verifying " + LoginListener.a(this.a).getName(), exception);
-            }
+            LoginListener.c(this.a).server.getLogger().log(java.util.logging.Level.WARNING, "Exception verifying " + gameprofile.getName(), exception); // Use variable to fix the NPE
             // CraftBukkit end
         }
     }
@@ -70,12 +70,12 @@ class ThreadPlayerLookupUUID implements Runnable {
             return;
         }
 
-        String playerName = LoginListener.a(this.a).getName();
-        java.net.InetAddress address = ((java.net.InetSocketAddress) a.networkManager.getSocketAddress()).getAddress();
-        java.util.UUID uniqueId = LoginListener.a(this.a).getId();
+        final String playerName = LoginListener.a(this.a).getName();
+        final InetAddress address = ((InetSocketAddress) a.networkManager.getSocketAddress()).getAddress();
+        final UUID uniqueId = LoginListener.a(this.a).getId();
         final org.bukkit.craftbukkit.CraftServer server = LoginListener.c(this.a).server;
 
-        AsyncPlayerPreLoginEvent asyncEvent = new AsyncPlayerPreLoginEvent(playerName, address, uniqueId);
+        final AsyncPlayerPreLoginEvent asyncEvent = new AsyncPlayerPreLoginEvent(playerName, address, uniqueId);
         server.getPluginManager().callEvent(asyncEvent);
 
         if (PlayerPreLoginEvent.getHandlerList().getRegisteredListeners().length != 0) {
@@ -103,7 +103,7 @@ class ThreadPlayerLookupUUID implements Runnable {
         }
         // CraftBukkit end
 
-        LoginListener.e().info("UUID of player " + LoginListener.a(this.a).getName() + " is " + LoginListener.a(this.a).getId());
+        LoginListener.e().info("UUID of player " + playerName + " is " + uniqueId);
         LoginListener.a(this.a, EnumProtocolState.READY_TO_ACCEPT);
     }
 }

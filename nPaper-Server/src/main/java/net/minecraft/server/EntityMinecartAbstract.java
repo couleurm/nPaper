@@ -115,7 +115,7 @@ public abstract class EntityMinecartAbstract extends Entity {
             } else {
                 // CraftBukkit start - fire VehicleDamageEvent
                 Vehicle vehicle = (Vehicle) this.getBukkitEntity();
-                org.bukkit.entity.Entity passenger = (damagesource.getEntity() == null) ? null : damagesource.getEntity().getBukkitEntity();
+                org.bukkit.entity.Entity passenger = (damagesource.getEntity() == null) ? null : (org.bukkit.entity.Entity) damagesource.getEntity().getBukkitEntity();
 
                 VehicleDamageEvent event = new VehicleDamageEvent(vehicle, passenger, f);
                 this.world.getServer().getPluginManager().callEvent(event);

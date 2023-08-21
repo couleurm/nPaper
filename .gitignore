@@ -7,6 +7,9 @@
 nbproject/
 nbactions.xml
 
+# VSCode
+.vscode/*
+
 # we use maven!
 pom.xml
 
@@ -25,6 +28,7 @@ manifest.mf
 
 # Mac filesystem dust
 .DS_Store/
+*.DS_Store
 
 # intellij
 *.iml

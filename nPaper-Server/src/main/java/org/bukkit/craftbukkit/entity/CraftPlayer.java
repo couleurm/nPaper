@@ -309,6 +309,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     @Override
+    public boolean hasProcessDisconnect() {
+        return getHandle().playerConnection.processedDisconnect;
+    }
+
+    @Override
     public String getDisplayName() {
         return getHandle().displayName;
     }

@@ -2,19 +2,10 @@ package org.bukkit.entity;
 
 import java.net.InetSocketAddress;
 
-import org.bukkit.Achievement;
-import org.bukkit.ChatColor;
-import org.bukkit.Effect;
-import org.bukkit.Instrument;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Note;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
-import org.bukkit.Statistic;
-import org.bukkit.WeatherType;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.conversations.Conversable;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.messaging.PluginMessageRecipient;
 import org.bukkit.scoreboard.Scoreboard;
@@ -34,6 +25,12 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
      * @return player's ping
      */
     public int getPing();
+
+    /**
+     * Can be use in plugins to check if the player will be offline
+     * @return true if the player is disconnecting
+     */
+    public boolean hasProcessDisconnect();
 
     /**
      * Gets the "friendly" name to display of this player. This may include

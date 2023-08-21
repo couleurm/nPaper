@@ -78,7 +78,7 @@ public class PlayerConnection implements PacketPlayInListener {
     private double z;
     private double q;
     public boolean checkMovement = true; // CraftBukkit - private -> public
-    private boolean processedDisconnect; // CraftBukkit - added
+    public boolean processedDisconnect; // CraftBukkit - added // nPaper private -> public
 
     public PlayerConnection(MinecraftServer minecraftserver, NetworkManager networkmanager, EntityPlayer entityplayer) {
         this.minecraftServer = minecraftserver;

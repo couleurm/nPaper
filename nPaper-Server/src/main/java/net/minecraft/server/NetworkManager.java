@@ -108,7 +108,7 @@ public class NetworkManager extends SimpleChannelInboundHandler {
     }
 
     protected void a(ChannelHandlerContext channelhandlercontext, Packet packet) {
-        if (this.m.isOpen()) {
+        if (this.m.isActive()) {
             if (packet.a()) {
                 packet.handle(this.o);
             } else {
@@ -124,7 +124,7 @@ public class NetworkManager extends SimpleChannelInboundHandler {
     }
 
     public void handle(Packet packet, GenericFutureListener... agenericfuturelistener) {
-        if (this.m != null && this.m.isOpen()) {
+        if (this.m != null && this.m.isActive()) {
             this.i();
             this.b(packet, agenericfuturelistener);
         } else {
@@ -153,7 +153,7 @@ public class NetworkManager extends SimpleChannelInboundHandler {
     }
 
     private void i() {
-        if (this.m != null && this.m.isOpen()) {
+        if (this.m != null && this.m.isActive()) {
             // PaperSpigot  start - Improve Network Manager packet handling
             QueuedPacket queuedpacket;
             while ((queuedpacket = (QueuedPacket) this.l.poll()) != null) {
@@ -205,7 +205,7 @@ public class NetworkManager extends SimpleChannelInboundHandler {
         this.k.clear();
         this.l.clear();
         // Spigot End
-        if (this.m.isOpen()) {
+        if (this.m.isActive()) {
             this.m.close();
             this.q = ichatbasecomponent;
         }
@@ -222,7 +222,7 @@ public class NetworkManager extends SimpleChannelInboundHandler {
     }
 
     public boolean isConnected() {
-        return this.m != null && this.m.isOpen();
+        return this.m != null && this.m.isActive();
     }
 
     public PacketListener getPacketListener() {

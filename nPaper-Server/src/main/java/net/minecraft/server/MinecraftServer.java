@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.Proxy;
 import java.security.KeyPair;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -26,6 +27,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.craftbukkit.SpigotTimings; // Spigot
 import org.bukkit.craftbukkit.util.Waitable;
 import org.bukkit.event.server.RemoteServerCommandEvent;
+import org.bukkit.event.server.ServerDateChangeEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 
 import jline.console.ConsoleReader;
@@ -101,6 +103,8 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo
     public java.util.Queue<Runnable> processQueue = new java.util.concurrent.ConcurrentLinkedQueue<Runnable>();
     public int autosavePeriod;
     // CraftBukkit end
+    
+    private LocalDate date = LocalDate.now();
 
     public MinecraftServer(OptionSet options, Proxy proxy) { // CraftBukkit - signature file -> OptionSet
         net.minecraft.util.io.netty.util.ResourceLeakDetector.setEnabled( false ); // Spigot - disable
@@ -727,7 +731,11 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo
 	        }
         }
         SpigotTimings.timeUpdateTimer.stopTiming(); // Spigot
-
+        // Rinny start - add ServerDateChangeEvent
+        if ((this.ticks % 200) == 0 && needDayUpdate()) {
+        	this.server.getPluginManager().callEvent(new ServerDateChangeEvent());
+        }
+        // Rinny end
         int i;
 
         for (i = 0; i < this.worlds.size(); ++i) {
@@ -813,6 +821,16 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo
         SpigotTimings.tickablesTimer.stopTiming(); // Spigot
 
         this.methodProfiler.b();
+    }
+    
+    private boolean needDayUpdate() {
+    	final LocalDate now = LocalDate.now();
+    	boolean needUpdate = false;
+    	if (this.date.getDayOfMonth() != now.getDayOfMonth()) {
+    		this.date = now;
+    		needUpdate = true;
+    	}
+    	return needUpdate;
     }
 
     public boolean getAllowNether() {

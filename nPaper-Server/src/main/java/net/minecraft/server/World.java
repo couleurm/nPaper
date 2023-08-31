@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
+
 // PaperSpigot start
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +27,7 @@ import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.weather.ThunderChangeEvent;
+
 // CraftBukkit end
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
@@ -186,7 +187,7 @@ public abstract class World implements IBlockAccess {
                 CrashReport crashreport = CrashReport.a(throwable, "Getting biome");
                 CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Coordinates of biome request");
 
-                crashreportsystemdetails.a("Location", (Callable) (new CrashReportWorldLocation(this, i, j)));
+                crashreportsystemdetails.a("Location", new CrashReportWorldLocation(this, i, j));
                 throw new ReportedException(crashreport);
             }
         } else {
@@ -707,7 +708,7 @@ public abstract class World implements IBlockAccess {
                     l = -1;
                 }
 
-                crashreportsystemdetails.a("Source block type", (Callable) (new CrashReportSourceBlockType(this, block)));
+                crashreportsystemdetails.a("Source block type", new CrashReportSourceBlockType(this, block));
                 CrashReportSystemDetails.a(crashreportsystemdetails, i, j, k, block1, l);
                 throw new ReportedException(crashreport);
             }
@@ -1648,7 +1649,7 @@ public abstract class World implements IBlockAccess {
 
         timings.tileEntityPending.stopTiming(); // Spigot
         this.methodProfiler.b();
-        this.methodProfiler.b();
+        //this.methodProfiler.b();
     }
 
     public void a(Collection collection) {
@@ -2916,22 +2917,25 @@ public abstract class World implements IBlockAccess {
     public EntityHuman findNearbyPlayer(double d0, double d1, double d2, double d3) {
         double d4 = -1.0D;
         EntityHuman entityhuman = null;
-
-        for (int i = 0; i < this.players.size(); ++i) {
-            EntityHuman entityhuman1 = (EntityHuman) this.players.get(i);
-            // CraftBukkit start - Fixed an NPE
-            if (entityhuman1 == null || entityhuman1.dead) {
-                continue;
-            }
-            // CraftBukkit end
-            double d5 = entityhuman1.e(d0, d1, d2);
-
-            if ((d3 < 0.0D || d5 < d3 * d3) && (d4 == -1.0D || d5 < d4)) {
-                d4 = d5;
-                entityhuman = entityhuman1;
-            }
+        for (double x = d0 - d3; x <= d0 + d3; x += 16.0D) {
+        	for (double z = d2 - d3; z <= d2 + d3; z += 16.0D) {
+        		Chunk chunk = getChunkIfLoaded((int)x >> 4, (int)z >> 4);
+        		if (chunk == null) continue;
+        		for (EntityPlayer entityPlayer : chunk.playersInChunk) {
+		            // CraftBukkit start - Fixed an NPE
+		            if (entityPlayer == null || entityPlayer.dead) {
+		                continue;
+		            }
+		            // CraftBukkit end
+		            double d5 = entityPlayer.e(d0, d1, d2);
+		
+		            if ((d3 < 0.0D || d5 < d3 * d3) && (d4 == -1.0D || d5 < d4)) {
+		                d4 = d5;
+		                entityhuman = entityPlayer;
+		            }
+		        }
+        	}
         }
-
         return entityhuman;
     }
 
@@ -2943,39 +2947,43 @@ public abstract class World implements IBlockAccess {
         double d4 = -1.0D;
         EntityHuman entityhuman = null;
 
-        for (int i = 0; i < this.players.size(); ++i) {
-            EntityHuman entityhuman1 = (EntityHuman) this.players.get(i);
-            // CraftBukkit start - Fixed an NPE
-            if (entityhuman1 == null || entityhuman1.dead) {
-                continue;
-            }
-            // CraftBukkit end
-
-            if (!entityhuman1.abilities.isInvulnerable && entityhuman1.isAlive()) {
-                double d5 = entityhuman1.e(d0, d1, d2);
-                double d6 = d3;
-
-                if (entityhuman1.isSneaking()) {
-                    d6 = d3 * 0.800000011920929D;
-                }
-
-                if (entityhuman1.isInvisible()) {
-                    float f = entityhuman1.bE();
-
-                    if (f < 0.1F) {
-                        f = 0.1F;
-                    }
-
-                    d6 *= (double) (0.7F * f);
-                }
-
-                if ((d3 < 0.0D || d5 < d6 * d6) && (d4 == -1.0D || d5 < d4)) {
-                    d4 = d5;
-                    entityhuman = entityhuman1;
-                }
-            }
+        for (double x = d0 - d3; x <= d0 + d3; x += 16.0D) {
+        	for (double z = d2 - d3; z <= d2 + d3; z += 16.0D) {
+        		Chunk chunk = getChunkIfLoaded((int)x >> 4, (int)z >> 4);
+        		if (chunk == null) continue;
+        		for (EntityPlayer entityPlayer : chunk.playersInChunk) {
+		            // CraftBukkit start - Fixed an NPE
+		            if (entityPlayer == null || entityPlayer.dead) {
+		                continue;
+		            }
+		            // CraftBukkit end
+		
+		            if (!entityPlayer.abilities.isInvulnerable && entityPlayer.isAlive()) {
+		                double d5 = entityPlayer.e(d0, d1, d2);
+		                double d6 = d3;
+		
+		                if (entityPlayer.isSneaking()) {
+		                    d6 = d3 * 0.800000011920929D;
+		                }
+		
+		                if (entityPlayer.isInvisible()) {
+		                    float f = entityPlayer.bE();
+		
+		                    if (f < 0.1F) {
+		                        f = 0.1F;
+		                    }
+		
+		                    d6 *= (double) (0.7F * f);
+		                }
+		
+		                if ((d3 < 0.0D || d5 < d6 * d6) && (d4 == -1.0D || d5 < d4)) {
+		                    d4 = d5;
+		                    entityhuman = entityPlayer;
+		                }
+		            }
+		        }
+        	}
         }
-
         return entityhuman;
     }
 
@@ -3195,8 +3203,8 @@ public abstract class World implements IBlockAccess {
         CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Affected level", 1);
 
         crashreportsystemdetails.a("Level name", (this.worldData == null ? "????" : this.worldData.getName()));
-        crashreportsystemdetails.a("All players", (Callable) (new CrashReportPlayers(this)));
-        crashreportsystemdetails.a("Chunk stats", (Callable) (new CrashReportChunkStats(this)));
+        crashreportsystemdetails.a("All players", new CrashReportPlayers(this));
+        crashreportsystemdetails.a("Chunk stats", new CrashReportChunkStats(this));
 
         try {
             this.worldData.a(crashreportsystemdetails);

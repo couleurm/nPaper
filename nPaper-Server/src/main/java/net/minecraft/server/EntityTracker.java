@@ -1,7 +1,6 @@
 package net.minecraft.server;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,6 +69,19 @@ public class EntityTracker {
     public void addEntity(Entity entity, int i, int j) {
         this.addEntity(entity, i, j, false);
     }
+    
+	private List<EntityPlayer> getPlayersToTrack(Entity entity, int range) {
+		final List<EntityPlayer> players = new ArrayList<EntityPlayer>();
+		for (double x = entity.locX - range; x <= entity.locX + range; x += 16.0D) {
+			for (double z = entity.locZ - range; z <= entity.locZ + range; z += 16.0D) {
+				final Chunk chunk = entity.world.getChunkIfLoaded((int)x >> 4, (int)z >> 4);
+				if (chunk != null) {
+					players.addAll(chunk.playersInChunk); 
+				}
+			} 
+		} 
+		return players;
+	}
 
     public void addEntity(Entity entity, int i, int j, boolean flag) {
         org.spigotmc.AsyncCatcher.catchOp( "entity track"); // Spigot
@@ -87,13 +99,16 @@ public class EntityTracker {
 
             this.c.add(entitytrackerentry);
             this.trackedEntities.a(entity.getId(), entitytrackerentry);
-            entitytrackerentry.scanPlayers(this.world.players);
+            if (entity instanceof EntityArrow) {
+                return; 
+            }
+            entitytrackerentry.scanPlayers(getPlayersToTrack(entity, i));
         } catch (Throwable throwable) {
             CrashReport crashreport = CrashReport.a(throwable, "Adding entity to track");
             CrashReportSystemDetails crashreportsystemdetails = crashreport.a("Entity To Track");
 
             crashreportsystemdetails.a("Tracking range", (i + " blocks"));
-            crashreportsystemdetails.a("Update interval", (Callable) (new CrashReportEntityTrackerUpdateInterval(this, j)));
+            crashreportsystemdetails.a("Update interval", new CrashReportEntityTrackerUpdateInterval(this, j));
             entity.a(crashreportsystemdetails);
             CrashReportSystemDetails crashreportsystemdetails1 = crashreport.a("Entity That Is Already Tracked");
 

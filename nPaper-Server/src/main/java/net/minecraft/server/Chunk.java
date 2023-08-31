@@ -3,6 +3,7 @@ package net.minecraft.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class Chunk {
     private ChunkMap chunkMap17;
     private ChunkMap chunkMap18;
     private int emptySectionBits;
+    public HashSet<EntityPlayer> playersInChunk = new HashSet<EntityPlayer>();
 
     public ChunkMap getChunkMap(boolean groundUpContinuous, int primaryBitMask, int version) {
         if (!world.paperSpigotConfig.cacheChunkMaps || !groundUpContinuous || (primaryBitMask != 0 && primaryBitMask != '\uffff')) {
@@ -713,6 +715,9 @@ public class Chunk {
         this.entitySlices[k].add(entity);
         // Spigot start - increment creature type count
         // Keep this synced up with World.a(Class)
+        if (entity instanceof EntityPlayer) {
+            this.playersInChunk.add((EntityPlayer)entity);
+        }
         if (entity instanceof EntityInsentient) {
             EntityInsentient entityinsentient = (EntityInsentient) entity;
             if (entityinsentient.isTypeNotPersistent() && entityinsentient.isPersistent()) {
@@ -745,6 +750,9 @@ public class Chunk {
         this.entitySlices[i].remove(entity);
         // Spigot start - decrement creature type count
         // Keep this synced up with World.a(Class)
+        if (entity instanceof EntityPlayer) {
+            this.playersInChunk.remove((EntityPlayer)entity);
+        }
         if (entity instanceof EntityInsentient) {
             EntityInsentient entityinsentient = (EntityInsentient) entity;
             if (entityinsentient.isTypeNotPersistent() && entityinsentient.isPersistent()) {
@@ -854,7 +862,9 @@ public class Chunk {
 
             while (iterator.hasNext()) {
                 Entity entity = (Entity) iterator.next();
-
+                if (entity instanceof EntityPlayer) {
+                    this.playersInChunk.add((EntityPlayer)entity);
+                }
                 entity.X();
             }
 
@@ -906,6 +916,7 @@ public class Chunk {
                 // (which for example disables inventory icon updates and prevents block breaking)
                 if (entity instanceof EntityPlayer) {
                     iter.remove();
+                    this.playersInChunk.remove(entity);
                 }
             }
             // CraftBukkit end

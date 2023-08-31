@@ -739,7 +739,7 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo
         int i;
 
         for (i = 0; i < this.worlds.size(); ++i) {
-            long j = System.nanoTime();
+            //long j = System.nanoTime();
 
             // if (i == 0 || this.getAllowNether()) {
                 WorldServer worldserver = this.worlds.get(i);

@@ -320,8 +320,6 @@ public class WorldServer extends World {
 
     protected void g() {
         super.g();
-        int i = 0;
-        int j = 0;
         // CraftBukkit start
         // Iterator iterator = this.chunkTickList.iterator();
 
@@ -424,11 +422,9 @@ public class WorldServer extends World {
                         int l2 = j2 >> 8 & 15;
                         int i3 = j2 >> 16 & 15;
 
-                        ++j;
                         Block block = chunksection.getTypeId(k2, i3, l2);
 
                         if (block.isTicking()) {
-                            ++i;
                             this.growthOdds = (iter.value() < 1) ? this.modifiedOdds : 100; // Spigot - grow fast if no players are in this chunk (value = player count)
                             block.a(this, k2 + k, i3 + chunksection.getYPosition(), l2 + l, this.random);
                         }
@@ -818,6 +814,8 @@ public class WorldServer extends World {
 
             this.chunkProvider.saveChunks(flag, iprogressupdate);
             // CraftBukkit - ArrayList -> Collection
+            // PandaSpigot removed it because as it seems Bukkit has its own system for this.
+            /*
             Collection arraylist = this.chunkProviderServer.a();
             Iterator iterator = arraylist.iterator();
 
@@ -827,7 +825,7 @@ public class WorldServer extends World {
                 if (chunk != null && !this.manager.a(chunk.locX, chunk.locZ)) {
                     this.chunkProviderServer.queueUnload(chunk.locX, chunk.locZ);
                 }
-            }
+            }*/
         }
     }
 

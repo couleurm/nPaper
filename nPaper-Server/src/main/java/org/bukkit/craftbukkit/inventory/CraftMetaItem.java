@@ -21,7 +21,7 @@ import net.minecraft.server.NBTTagList;
 import net.minecraft.server.NBTTagLong;
 import net.minecraft.server.NBTTagString;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.DelegateDeserialization;

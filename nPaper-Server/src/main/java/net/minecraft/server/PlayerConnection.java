@@ -230,7 +230,7 @@ public class PlayerConnection implements PacketPlayInListener {
                 to.setPitch(packetplayinflying.pitch);
             }
 
-            if (this.checkMovement && !this.player.dead) {
+            if (this.checkMovement) {
             	// Prevent 40 event-calls for less than a single pixel of movement >.>
                 double delta = Math.pow(this.lastPosX - to.getX(), 2) + Math.pow(this.lastPosY - to.getY(), 2) + Math.pow(this.lastPosZ - to.getZ(), 2);
                 float deltaAngle = Math.abs(this.lastYaw - to.getYaw()) + Math.abs(this.lastPitch - to.getPitch());

@@ -475,7 +475,7 @@ public abstract class World implements IBlockAccess {
     public void notifyAndUpdatePhysics(int i, int j, int k, Chunk chunk, Block oldBlock, Block newBlock, int flag)
     {
         // should be isReady()
-        if ((flag & 2) != 0 && (chunk == null || chunk.isReady())) { // allow chunk to be null here as chunk.isReady() is false when we send our notification during block placement
+    	if ((flag & 2) != 0 && (!this.isStatic || (flag & 4) == 0) && (chunk == null || chunk.isReady())) { // allow chunk to be null here as chunk.isReady() is false when we send our notification during block placement
             this.notify(i, j, k);
         }
 
@@ -640,6 +640,7 @@ public abstract class World implements IBlockAccess {
     }
 
     public void applyPhysics(int i, int j, int k, Block block) {
+    	if (captureBlockStates) return;
         this.e(i - 1, j, k, block);
         this.e(i + 1, j, k, block);
         this.e(i, j - 1, k, block);
@@ -1667,7 +1668,6 @@ public abstract class World implements IBlockAccess {
     public void entityJoinedWorld(Entity entity, boolean flag) {
         int i = MathHelper.floor(entity.locX);
         int j = MathHelper.floor(entity.locZ);
-        byte b0 = 32;
 
         // Spigot start
         if (!org.spigotmc.ActivationRange.checkIfActive(entity)) {
@@ -1720,7 +1720,7 @@ public abstract class World implements IBlockAccess {
             }
 
             int k = MathHelper.floor(entity.locX / 16.0D);
-            int l = MathHelper.floor(entity.locY / 16.0D);
+            int l = Math.min(15, Math.max(0, MathHelper.floor(entity.locY / 16.0D))); // Paper - stay consistent with chunk add/remove behavior
             int i1 = MathHelper.floor(entity.locZ / 16.0D);
 
             if (!entity.ag || entity.ah != k || entity.ai != l || entity.aj != i1) {
@@ -1728,12 +1728,10 @@ public abstract class World implements IBlockAccess {
                 if (entity.ag && this.isChunkLoaded(entity.ah, entity.aj)) {
                     this.getChunkAt(entity.ah, entity.aj).a(entity, entity.ai);
                 }
-
-                if (this.isChunkLoaded(k, i1)) {
-                    entity.ag = true;
+                
+                final boolean loaded = entity.ag = this.isChunkLoaded(k, i1);
+                if (loaded) {
                     this.getChunkAt(k, i1).a(entity);
-                } else {
-                    entity.ag = false;
                 }
             }
 

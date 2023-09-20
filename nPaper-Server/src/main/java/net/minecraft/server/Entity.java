@@ -596,24 +596,25 @@ public abstract class Entity {
                 }
 
                 this.boundingBox.d(0.0D, 0.0D, d2);
-                if (!this.J && d8 != d2) {
-                    d2 = 0.0D;
-                    d1 = 0.0D;
-                    d0 = 0.0D;
-                }
+                if (!this.J) {
+                	if (d8 != d2) {
+                		d2 = 0.0D;
+                        d1 = 0.0D;
+                        d0 = 0.0D;
+                	}
+                	if (d7 != d1) {
+                		d2 = 0.0D;
+                        d1 = 0.0D;
+                        d0 = 0.0D;
+                	} else {
+                		d1 = (double) (-this.W);
 
-                if (!this.J && d7 != d1) {
-                    d2 = 0.0D;
-                    d1 = 0.0D;
-                    d0 = 0.0D;
-                } else {
-                    d1 = (double) (-this.W);
+                        for (k = 0; k < list.size(); ++k) {
+                            d1 = ((AxisAlignedBB) list.get(k)).b(this.boundingBox, d1);
+                        }
 
-                    for (k = 0; k < list.size(); ++k) {
-                        d1 = ((AxisAlignedBB) list.get(k)).b(this.boundingBox, d1);
-                    }
-
-                    this.boundingBox.d(0.0D, d1, 0.0D);
+                        this.boundingBox.d(0.0D, d1, 0.0D);
+                	}
                 }
 
                 if (d10 * d10 + d12 * d12 >= d0 * d0 + d2 * d2) {

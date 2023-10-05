@@ -20,7 +20,8 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
     protected final CraftServer server;
     protected Entity entity;
     private EntityDamageEvent lastDamageEvent;
-    private float knockbackReduction = 0.0f;
+    private float verticalKnockbackReduction = 0.0f;
+    private float horizontalKnockbackReduction = 0.0f;
 
     public CraftEntity(final CraftServer server, final Entity entity) {
         this.server = server;
@@ -277,12 +278,20 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         return server;
     }
     
-    public void setKnockbackReduction(float reduction) {
-		this.knockbackReduction = reduction;
+    public void setVerticalKnockbackReduction(float reduction) {
+		this.verticalKnockbackReduction = reduction;
 	}
       
-	public float getKnockbackReduction() {
-		return this.knockbackReduction;
+	public float getVerticalKnockbackReduction() {
+		return this.verticalKnockbackReduction;
+	}
+	
+	public void setHorizontalKnockbackReduction(float reduction) {
+		this.horizontalKnockbackReduction = reduction;
+	}
+      
+	public float getHorizontalKnockbackReduction() {
+		return this.horizontalKnockbackReduction;
 	}
 
     public Vector getMomentum() {

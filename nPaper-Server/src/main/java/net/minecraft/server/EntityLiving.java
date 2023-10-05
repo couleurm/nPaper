@@ -882,16 +882,19 @@ public abstract class EntityLiving extends Entity {
         if (this.random.nextDouble() >= this.getAttributeInstance(GenericAttributes.c).getValue()) {
             this.al = true;
             // Rinny start - configurable knockback
-            double magnitude = MathHelper.sqrt(d0 * d0 + d1 * d1);
-            final double knockbackReduction = getBukkitEntity().getKnockbackReduction();
-            final double force = (world.paperSpigotConfig.knockbackForceAndHeight * (1.0D - knockbackReduction));
+            final double magnitude = MathHelper.sqrt(Math.pow(d0, 2) + Math.pow(d1, 2));
+            final double verticalKnockbackReduction = getBukkitEntity().getVerticalKnockbackReduction();
+            final double horizontalKnockbackReduction = getBukkitEntity().getHorizontalKnockbackReduction();
+            final double force = (world.paperSpigotConfig.knockbackHorizontal * (1.0D - horizontalKnockbackReduction));
+            final double height = (world.paperSpigotConfig.knockbackHeight * (1.0D - verticalKnockbackReduction));
+            final double friction = world.paperSpigotConfig.knockbackFriction;
 
-            this.motX /= 2.0;
-            this.motY /= 2.0;
-            this.motZ /= 2.0;
+            this.motX /= friction;
+            this.motY /= friction;
+            this.motZ /= friction;
 
             this.motX -= d0 / magnitude * force;
-            this.motY = MathHelper.limit(this.motY + force, 0.05D, this.world.paperSpigotConfig.knockbackVerticalLimit);
+            this.motY = MathHelper.limit(this.motY + height, 0.05D, this.world.paperSpigotConfig.knockbackVerticalLimit);
             this.motZ -= d1 / magnitude * force;
             // Rinny end
         }

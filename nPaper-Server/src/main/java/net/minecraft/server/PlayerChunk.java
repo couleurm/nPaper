@@ -9,69 +9,64 @@ import java.util.HashMap;
 // CraftBukkit end
 
 class PlayerChunk {
-
-    private final List b;
+    private final List<EntityPlayer> players;
     private final ChunkCoordIntPair location;
     private short[] dirtyBlocks;
     private int dirtyCount;
     private int f;
-    private long g;
+    private long lastUpdateTime;
     final PlayerChunkMap playerChunkMap;
     // CraftBukkit start - add fields
-    private final HashMap<EntityPlayer, Runnable> players = new HashMap<EntityPlayer, Runnable>();
+    private final HashMap<EntityPlayer, Runnable> playerRunnables = new HashMap<EntityPlayer, Runnable>();
     private boolean loaded = false;
-    private Runnable loadedRunnable = new Runnable() {
-        public void run() {
-            PlayerChunk.this.loaded = true;
-        }
-    };
+    private Runnable loadedRunnable = this::markAsLoaded;
     // CraftBukkit end
+    
+    private void markAsLoaded() {
+        loaded = true;
+    }
 
     public PlayerChunk(PlayerChunkMap playerchunkmap, int i, int j) {
         this.playerChunkMap = playerchunkmap;
-        this.b = new ArrayList();
+        this.players = new ArrayList<EntityPlayer>();
         this.dirtyBlocks = new short[64];
         this.location = new ChunkCoordIntPair(i, j);
         playerchunkmap.a().chunkProviderServer.getChunkAt(i, j, this.loadedRunnable); // CraftBukkit
     }
 
     public void a(final EntityPlayer entityplayer) { // CraftBukkit - added final to argument
-        if (this.b.contains(entityplayer)) {
+        if (this.players.contains(entityplayer)) {
             PlayerChunkMap.c().debug("Failed to add player. {} already is in chunk {}, {}", new Object[] { entityplayer, Integer.valueOf(this.location.x), Integer.valueOf(this.location.z)});
         } else {
-            if (this.b.isEmpty()) {
-                this.g = PlayerChunkMap.a(this.playerChunkMap).getTime();
+            if (this.players.isEmpty()) {
+                this.lastUpdateTime = PlayerChunkMap.a(this.playerChunkMap).getTime();
             }
 
-            this.b.add(entityplayer);
+            this.players.add(entityplayer);
             // CraftBukkit start - use async chunk io
             Runnable playerRunnable;
             if (this.loaded) {
                 playerRunnable = null;
                 entityplayer.chunkCoordIntPairQueue.add(this.location);
             } else {
-                playerRunnable = new Runnable() {
-                    public void run() {
-                        entityplayer.chunkCoordIntPairQueue.add(PlayerChunk.this.location);
-                    }
-                };
+            	playerRunnable = () -> entityplayer.chunkCoordIntPairQueue.add(location);
                 this.playerChunkMap.a().chunkProviderServer.getChunkAt(this.location.x, this.location.z, playerRunnable);
             }
 
-            this.players.put(entityplayer, playerRunnable);
+            this.playerRunnables.put(entityplayer, playerRunnable);
             // CraftBukkit end
         }
     }
 
     public void b(EntityPlayer entityplayer) {
-        if (this.b.contains(entityplayer)) {
+        if (this.players.contains(entityplayer)) {
             // CraftBukkit start - If we haven't loaded yet don't load the chunk just so we can clean it up
             if (!this.loaded) {
-                ChunkIOExecutor.dropQueuedChunkLoad(this.playerChunkMap.a(), this.location.x, this.location.z, this.players.get(entityplayer));
-                this.b.remove(entityplayer);
+                ChunkIOExecutor.dropQueuedChunkLoad(this.playerChunkMap.a(), this.location.x, this.location.z, this.playerRunnables.get(entityplayer));
                 this.players.remove(entityplayer);
+                this.playerRunnables.remove(entityplayer);
 
-                if (this.b.isEmpty()) {
+                if (this.players.isEmpty()) {
                     ChunkIOExecutor.dropQueuedChunkLoad(this.playerChunkMap.a(), this.location.x, this.location.z, this.loadedRunnable);
                     long i = (long) this.location.x + 2147483647L | (long) this.location.z + 2147483647L << 32;
                     PlayerChunkMap.b(this.playerChunkMap).remove(i);
@@ -88,10 +83,10 @@ class PlayerChunk {
                 entityplayer.playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 0, entityplayer.playerConnection.networkManager.getVersion())); // Spigot - protocol patch
             }
 
-            this.players.remove(entityplayer); // CraftBukkit
-            this.b.remove(entityplayer);
+            this.playerRunnables.remove(entityplayer); // CraftBukkit
+            this.players.remove(entityplayer);
             entityplayer.chunkCoordIntPairQueue.remove(this.location);
-            if (this.b.isEmpty()) {
+            if (this.players.isEmpty()) {
                 long i = (long) this.location.x + 2147483647L | (long) this.location.z + 2147483647L << 32;
 
                 this.a(chunk);
@@ -111,8 +106,8 @@ class PlayerChunk {
     }
 
     private void a(Chunk chunk) {
-        chunk.s += PlayerChunkMap.a(this.playerChunkMap).getTime() - this.g;
-        this.g = PlayerChunkMap.a(this.playerChunkMap).getTime();
+        chunk.s += PlayerChunkMap.a(this.playerChunkMap).getTime() - this.lastUpdateTime;
+        this.lastUpdateTime = PlayerChunkMap.a(this.playerChunkMap).getTime();
     }
 
     public void a(int i, int j, int k) {
@@ -135,13 +130,11 @@ class PlayerChunk {
     }
 
     public void sendAll(Packet packet) {
-        for (int i = 0; i < this.b.size(); ++i) {
-            EntityPlayer entityplayer = (EntityPlayer) this.b.get(i);
-
-            if (!entityplayer.chunkCoordIntPairQueue.contains(this.location)) {
+    	for (EntityPlayer entityplayer : this.players) {
+    		if (!entityplayer.chunkCoordIntPairQueue.contains(this.location)) {
                 entityplayer.playerConnection.sendPacket(packet);
             }
-        }
+    	}
     }
 
     public void b() {
@@ -169,8 +162,8 @@ class PlayerChunk {
 
                     Chunk chunk = PlayerChunkMap.a( this.playerChunkMap ).getChunkAt( this.location.x, this.location.z );
                     
-                    for (int idx = 0; idx < this.b.size(); ++idx) {
-                        EntityPlayer entityplayer = (EntityPlayer) this.b.get(idx);
+                    for (int idx = 0; idx < this.players.size(); ++idx) {
+                        EntityPlayer entityplayer = (EntityPlayer) this.players.get(idx);
 
                         if (!entityplayer.chunkCoordIntPairQueue.contains(this.location)) {
                             entityplayer.playerConnection.sendPacket(new PacketPlayOutMapChunk( chunk, (this.f == 0xFFFF), this.f, entityplayer.playerConnection.networkManager.getVersion()));
@@ -222,6 +215,6 @@ class PlayerChunk {
     }
 
     static List b(PlayerChunk playerchunk) {
-        return playerchunk.b;
+        return playerchunk.players;
     }
 }

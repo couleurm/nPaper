@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.util.com.google.common.collect.Sets;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
-import net.minecraft.util.io.netty.buffer.Unpooled;
+import io.netty.buffer.Unpooled;
 import net.minecraft.util.org.apache.commons.io.Charsets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1025,7 +1025,6 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
 
     public void a(PacketPlayInSettings packetplayinsettings) {
 
-        CraftEventFactory.handlePlayerSettingsChangeEvent(this.getBukkitEntity(), packetplayinsettings);
 
         this.locale = packetplayinsettings.c();
         int i = 256 >> packetplayinsettings.d();
@@ -1050,6 +1049,10 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
             datawatcher.watch( 10, new ProtocolData.HiddenByte( (byte) packetplayinsettings.flags ) );
         }
         // Spigot end
+
+        // nPaper
+        CraftEventFactory.handlePlayerSettingsChangeEvent(this.getBukkitEntity(), packetplayinsettings);
+        // nPaper
     }
 
     public EnumChatVisibility getChatFlags() {

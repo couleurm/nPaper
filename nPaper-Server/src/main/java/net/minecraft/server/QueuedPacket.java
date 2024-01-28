@@ -1,6 +1,6 @@
 package net.minecraft.server;
 
-import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.GenericFutureListener;
 
 // CraftBukkit - imported class because the methods are package private
 class QueuedPacket {

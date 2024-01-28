@@ -1,10 +1,10 @@
 package net.minecraft.server;
 
-import net.minecraft.util.io.netty.channel.Channel;
-import net.minecraft.util.io.netty.channel.ChannelException;
-import net.minecraft.util.io.netty.channel.ChannelInitializer;
-import net.minecraft.util.io.netty.channel.ChannelOption;
-import net.minecraft.util.io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 
 class ServerConnectionChannel extends ChannelInitializer {
 
@@ -16,7 +16,7 @@ class ServerConnectionChannel extends ChannelInitializer {
 
     protected void initChannel(Channel channel) {
         try {
-            channel.config().setOption(ChannelOption.IP_TOS, Integer.valueOf(24));
+            channel.config().setOption(ChannelOption.IP_TOS, 0x18);
         } catch (ChannelException channelexception) {
             ;
         }

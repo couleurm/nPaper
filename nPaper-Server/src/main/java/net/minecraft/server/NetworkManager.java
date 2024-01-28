@@ -4,19 +4,20 @@ import java.net.SocketAddress;
 import java.util.Queue;
 import javax.crypto.SecretKey;
 
+import io.netty.channel.ChannelFuture;
 import net.minecraft.util.com.google.common.collect.Queues;
 import net.minecraft.util.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
-import net.minecraft.util.io.netty.channel.Channel;
-import net.minecraft.util.io.netty.channel.ChannelFutureListener;
-import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-import net.minecraft.util.io.netty.channel.SimpleChannelInboundHandler;
-import net.minecraft.util.io.netty.channel.local.LocalChannel;
-import net.minecraft.util.io.netty.channel.local.LocalServerChannel;
-import net.minecraft.util.io.netty.channel.nio.NioEventLoopGroup;
-import net.minecraft.util.io.netty.handler.timeout.TimeoutException;
-import net.minecraft.util.io.netty.util.AttributeKey;
-import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.local.LocalChannel;
+import io.netty.channel.local.LocalServerChannel;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.handler.timeout.TimeoutException;
+import io.netty.util.AttributeKey;
+import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.util.org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,9 +35,9 @@ public class NetworkManager extends SimpleChannelInboundHandler {
     public static final Marker a = MarkerManager.getMarker("NETWORK");
     public static final Marker b = MarkerManager.getMarker("NETWORK_PACKETS", a);
     public static final Marker c = MarkerManager.getMarker("NETWORK_STAT", a);
-    public static final AttributeKey d = new AttributeKey("protocol");
-    public static final AttributeKey e = new AttributeKey("receivable_packets");
-    public static final AttributeKey f = new AttributeKey("sendable_packets");
+    public static final AttributeKey d = AttributeKey.newInstance("protocol");
+    public static final AttributeKey e = AttributeKey.newInstance("receivable_packets");
+    public static final AttributeKey f = AttributeKey.newInstance("sendable_packets");
     public static final NioEventLoopGroup g = new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Client IO #%d").setDaemon(true).build());
     public static final NetworkStatistics h = new NetworkStatistics();
     private final boolean j;
@@ -54,7 +55,7 @@ public class NetworkManager extends SimpleChannelInboundHandler {
     private IChatBaseComponent q;
     private boolean r;
     // Spigot Start
-    public static final AttributeKey<Integer> protocolVersion = new AttributeKey<Integer>("protocol_version");
+    public static final AttributeKey<Integer> protocolVersion = AttributeKey.valueOf(Integer.class, "protocol_version");
     public static final ImmutableSet<Integer> SUPPORTED_VERSIONS = ImmutableSet.of(4, 5, 47);
     public static final int CURRENT_VERSION = 5;
     public static int getVersion(Channel attr)
@@ -72,8 +73,15 @@ public class NetworkManager extends SimpleChannelInboundHandler {
         this.j = flag;
     }
 
-    public void channelActive(ChannelHandlerContext channelhandlercontext) throws Exception { // CraftBukkit - throws Exception
-        super.channelActive(channelhandlercontext);
+    @Override
+    public void channelActive(ChannelHandlerContext channelhandlercontext) { // CraftBukkit - throws Exception
+
+        try {
+            super.channelActive(channelhandlercontext);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         this.m = channelhandlercontext.channel();
         this.n = this.m.remoteAddress();
         // Spigot Start

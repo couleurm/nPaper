@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 // CraftBukkit end
 
-import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.GenericFutureListener;
 
 public class PacketStatusListener implements PacketStatusInListener {
 

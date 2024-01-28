@@ -7,7 +7,7 @@ public class PacketPlayOutChat extends Packet {
     private IChatBaseComponent a;
     public net.md_5.bungee.api.chat.BaseComponent[] components; // Spigot
     private boolean b;
-    private int pos; // Spigot
+    private byte pos; // Spigot
 
     public PacketPlayOutChat() {
         this.b = true;
@@ -18,15 +18,15 @@ public class PacketPlayOutChat extends Packet {
     }
 
     // Spigot start
-    public PacketPlayOutChat(IChatBaseComponent ichatbasecomponent, int pos) {
+    public PacketPlayOutChat(IChatBaseComponent ichatbasecomponent, byte pos) {
         this(ichatbasecomponent, pos, true);
     }
 
     public PacketPlayOutChat(IChatBaseComponent ichatbasecomponent, boolean flag) {
-        this(ichatbasecomponent, 0, flag);
+        this(ichatbasecomponent, (byte) 0, flag);
     }
 
-    public PacketPlayOutChat(IChatBaseComponent ichatbasecomponent, int pos, boolean flag) {
+    public PacketPlayOutChat(IChatBaseComponent ichatbasecomponent, byte pos, boolean flag) {
         this.b = true;
         this.a = ichatbasecomponent;
         this.b = flag;

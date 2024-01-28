@@ -53,8 +53,8 @@ import org.bukkit.util.NumberConversions;
 import org.github.paperspigot.PaperSpigotConfig; // PaperSpigot
 
 import net.minecraft.util.com.google.common.base.Charsets;
-import net.minecraft.util.io.netty.buffer.Unpooled;
-import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
+import io.netty.buffer.Unpooled;
+import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.util.org.apache.commons.lang3.StringUtils;
 
 public class PlayerConnection implements PacketPlayInListener {
@@ -171,7 +171,7 @@ public class PlayerConnection implements PacketPlayInListener {
         // CraftBukkit end
         ChatComponentText chatcomponenttext = new ChatComponentText(s);
 
-        this.networkManager.handle(new PacketPlayOutKickDisconnect(chatcomponenttext), new GenericFutureListener[] { new PlayerConnectionFuture(this, chatcomponenttext)});
+        this.networkManager.handle(new PacketPlayOutKickDisconnect(chatcomponenttext), (future) -> {this.networkManager.close(chatcomponenttext);});
         this.a(chatcomponenttext); // CraftBukkit - Process quit immediately
         this.networkManager.g();
     }
@@ -1758,6 +1758,7 @@ public class PlayerConnection implements PacketPlayInListener {
     }
 
     public void a(PacketPlayInKeepAlive packetplayinkeepalive) {
+
         if (packetplayinkeepalive.c() == this.h) {
             int i = (int) (this.d() - this.i);
 

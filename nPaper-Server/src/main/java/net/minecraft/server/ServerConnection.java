@@ -7,12 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.util.com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.minecraft.util.io.netty.bootstrap.ServerBootstrap;
-import net.minecraft.util.io.netty.channel.ChannelFuture;
-import net.minecraft.util.io.netty.channel.nio.NioEventLoopGroup;
-import net.minecraft.util.io.netty.channel.socket.nio.NioServerSocketChannel;
-import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,6 +61,7 @@ public class ServerConnection {
                 if (!networkmanager.isConnected()) {
                     // Spigot Start
                     // Fix a race condition where a NetworkManager could be unregistered just before connection.
+
                     if (networkmanager.preparing) continue;
                     // Spigot End
                     iterator.remove();
@@ -84,7 +85,7 @@ public class ServerConnection {
                         b.warn("Failed to handle packet for " + networkmanager.getSocketAddress(), exception);
                         ChatComponentText chatcomponenttext = new ChatComponentText("Internal server error");
 
-                        networkmanager.handle(new PacketPlayOutKickDisconnect(chatcomponenttext), new GenericFutureListener[] { new ServerConnectionFuture(this, networkmanager, chatcomponenttext)});
+                        networkmanager.handle(new PacketPlayOutKickDisconnect(chatcomponenttext), (future) -> networkmanager.close(chatcomponenttext));
                         networkmanager.g();
                     }
                 }

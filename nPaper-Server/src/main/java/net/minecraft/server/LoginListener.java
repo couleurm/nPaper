@@ -19,8 +19,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraft.util.com.google.common.base.Charsets;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import net.minecraft.util.io.netty.util.concurrent.Future;
+import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.util.org.apache.commons.lang3.Validate;
 
 public class LoginListener implements PacketLoginInListener {

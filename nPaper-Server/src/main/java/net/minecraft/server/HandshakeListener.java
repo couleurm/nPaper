@@ -1,7 +1,7 @@
 package net.minecraft.server;
 
 import net.minecraft.util.com.mojang.authlib.properties.Property; // Spigot
-import io.netty.util.concurrent.GenericFutureListener;
+import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
 
 // CraftBukkit start
 import java.net.InetAddress;

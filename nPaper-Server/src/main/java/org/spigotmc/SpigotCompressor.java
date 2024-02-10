@@ -1,9 +1,9 @@
 package org.spigotmc;
 
 import net.minecraft.server.PacketDataSerializer;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
+import net.minecraft.util.io.netty.buffer.ByteBuf;
+import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
+import net.minecraft.util.io.netty.handler.codec.MessageToByteEncoder;
 
 import java.util.zip.Deflater;
 

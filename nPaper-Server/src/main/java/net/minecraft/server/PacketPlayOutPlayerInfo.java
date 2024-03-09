@@ -30,7 +30,7 @@ public class PacketPlayOutPlayerInfo extends Packet {
 
     public PacketPlayOutPlayerInfo(EntityPlayer player, PlayerInfo action) {
         this.action = action;
-        this.username = (player.playerConnection.networkManager.getVersion() < 28 ? ValidateUtils.limit(player.listName, 16) : player.listName); // Rinny - dont limit tablist name for 1.8 client
+        this.username = player.listName;
         this.player = player.getProfile();
         switch (action) {
             case ADD_PLAYER:
@@ -51,12 +51,25 @@ public class PacketPlayOutPlayerInfo extends Packet {
         // Not needed
     }
 
+    private String usernameS16;
+
     public void b(PacketDataSerializer packetdataserializer) throws IOException {
         // PaperSpigot start - Fix scoreboard prefix and suffix in tab list
         String username = this.username;
         if (packetdataserializer.version >= 47 && action == PlayerInfo.ADD_PLAYER && username != null && username.equals(player.getName())) {
             username = null;
         }
+
+        // Rinny - dont limit tablist name for 1.8 client
+        // nPaper - start
+        if (username != null) {
+            if (packetdataserializer.version < 28) {
+                if (usernameS16 == null) usernameS16 = ValidateUtils.limit(this.username, 16);
+                username = usernameS16;
+            }
+        }
+        // nPaper - end
+
         // PaperSpigot end
         if ( packetdataserializer.version >= 20 )
         {

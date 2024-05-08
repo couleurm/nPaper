@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import net.minecraft.server.EntityPotion;
 
-import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
